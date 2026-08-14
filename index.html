@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BIOS vs UEFI | مقارنة شاملة</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg: #070b16;
+            --bg2: #0c1222;
+            --card: rgba(18, 25, 43, 0.75);
+            --card2: rgba(25, 34, 57, 0.8);
+            --border: rgba(255,255,255,0.09);
+            --text: #f5f7ff;
+            --muted: #9aa6bd;
+            --blue: #4f8cff;
+            --cyan: #20d9ff;
+            --purple: #9b6cff;
+            --green: #31d891;
+            --red: #ff6577;
+            --yellow: #ffc857;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Cairo", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 10%, rgba(79,140,255,.15), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(155,108,255,.12), transparent 30%),
+                linear-gradient(135deg, #050811, #0a1020 50%, #070b16);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* خلفية زخرفية */
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .25;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 45px 45px;
+            mask-image: linear-gradient(to bottom, black, transparent);
+        }
+
+        .container {
+            width: min(1150px, calc(100% - 32px));
+            margin: auto;
+        }
+
+        /* Navbar */
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(18px);
+            background: rgba(7, 11, 22, .7);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            box-shadow: 0 0 25px rgba(79,140,255,.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: .25s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        /* Hero */
+
+        .hero {
+            min-height: 620px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 90px 0 70px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid rgba(79,140,255,.25);
+            background: rgba(79,140,255,.08);
+            border-radius: 50px;
+            color: #9bc0ff;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: var(--cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--cyan);
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 78px);
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 25px;
+        }
+
+        .gradient {
+            background: linear-gradient(
+                90deg,
+                #ffffff,
+                #73b1ff,
+                #a77cff
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: auto;
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 2;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 35px;
+        }
+
+        .btn {
+            border: 0;
+            cursor: pointer;
+            padding: 13px 24px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            transition: .25s;
+        }
+
+        .btn-primary {
+            color: white;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            box-shadow: 0 10px 30px rgba(79,140,255,.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(79,140,255,.3);
+        }
+
+        .btn-secondary {
+            color: white;
+            background: rgba(255,255,255,.05);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,.09);
+        }
+
+        /* Comparison cards */
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 100px;
+        }
+
+        .tech-card {
+            position: relative;
+            padding: 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            transition: .3s;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255,255,255,.17);
+        }
+
+        .tech-card::before {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: .2;
+            top: -80px;
+            left: -70px;
+        }
+
+        .bios::before {
+            background: var(--blue);
+        }
+
+        .uefi::before {
+            background: var(--purple);
+        }
+
+        .tech-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .tech-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .bios .tech-icon {
+            background: rgba(79,140,255,.13);
+            color: #6fa8ff;
+        }
+
+        .uefi .tech-icon {
+            background: rgba(155,108,255,.13);
+            color: #b08bff;
+        }
+
+        .tech-title h2 {
+            font-size: 28px;
+        }
+
+        .tech-title span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .description {
+            color: var(--muted);
+            line-height: 1.9;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .feature {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            font-size: 14px;
+        }
+
+        .feature:last-child {
+            border-bottom: 0;
+        }
+
+        .feature span:first-child {
+            color: #aab4c8;
+        }
+
+        .feature strong {
+            color: white;
+        }
+
+        /* Section */
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .section-title small {
+            color: var(--cyan);
+            font-weight: 700;
+        }
+
+        .section-title h2 {
+            font-size: 35px;
+            margin: 8px 0;
+        }
+
+        .section-title p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* Table */
+
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: rgba(13,19,33,.75);
+            margin-bottom: 100px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th, td {
+            padding: 19px 22px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+
+        th {
+            background: rgba(255,255,255,.035);
+            color: white;
+            font-size: 14px;
+        }
+
+        td {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        td:first-child {
+            color: white;
+            font-weight: 700;
+        }
+
+        .yes {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .no {
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        /* Score */
+
+        .scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 100px;
+        }
+
+        .score-card {
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--card);
+        }
+
+        .score-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .score-top h3 {
+            font-size: 18px;
+        }
+
+        .score-number {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .progress {
+            height: 9px;
+            border-radius: 50px;
+            background: rgba(255,255,255,.06);
+            overflow: hidden;
+        }
+
+        .progress span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+        }
+
+        .bios-progress {
+            width: 55%;
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+        }
+
+        .uefi-progress {
+            width: 95%;
+            background: linear-gradient(90deg, var(--purple), #d17cff);
+        }
+
+        /* Winner */
+
+        .winner {
+            padding: 50px;
+            margin-bottom: 80px;
+            text-align: center;
+            border-radius: 28px;
+            background:
+                radial-gradient(circle at center, rgba(79,140,255,.15), transparent 55%),
+                rgba(17,24,42,.8);
+            border: 1px solid rgba(79,140,255,.15);
+        }
+
+        .winner-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 18px;
+            display: grid;
+            place-items: center;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            font-size: 30px;
+            box-shadow: 0 0 40px rgba(79,140,255,.25);
+        }
+
+        .winner h2 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .winner p {
+            max-width: 650px;
+            margin: auto;
+            color: var(--muted);
+            line-height: 2;
+        }
+
+        /* Footer */
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 35px 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        /* Animation */
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(25px);
+            animation: reveal .8s forwards;
+        }
+
+        @keyframes reveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+
+        @media (max-width: 750px) {
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 70px 0 50px;
+                min-height: 520px;
+            }
+
+            .hero h1 {
+                font-size: 44px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .comparison,
+            .scores {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-card {
+                padding: 24px;
+            }
+
+            .winner {
+                padding: 35px 20px;
+            }
+
+            .section-title h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+
+    <nav>
+        <div class="container nav-inner">
+
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <span>TechCompare</span>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="#overview">نظرة عامة</a></li>
+                <li><a href="#comparison">المقارنة</a></li>
+                <li><a href="#table">الجدول</a></li>
+                <li><a href="#result">النتيجة</a></li>
+            </ul>
+
+        </div>
+    </nav>
+
+
+    <!-- Hero -->
+
+    <header class="hero" id="overview">
+
+        <div class="container">
+
+            <div class="badge reveal">
+                <span class="dot"></span>
+                مقارنة تقنية شاملة
+            </div>
+
+            <h1 class="reveal">
+                BIOS
+                <span class="gradient">VS</span>
+                UEFI
+            </h1>
+
+            <p class="reveal">
+                اكتشف الفرق بين نظام BIOS التقليدي وواجهة UEFI الحديثة،
+                وتعرّف على الفروقات في السرعة، الأمان، دعم الأقراص،
+                الواجهة والميزات الحديثة.
+            </p>
+
+            <div class="hero-buttons reveal">
+                <a href="#comparison" class="btn btn-primary">
+                    ابدأ المقارنة
+                </a>
+
+                <a href="#table" class="btn btn-secondary">
+                    عرض التفاصيل
+                </a>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- Main -->
+
+    <main class="container">
+
+        <!-- Cards -->
+
+        <section id="comparison">
+
+            <div class="section-title">
+                <small>01 — OVERVIEW</small>
+                <h2>التقنيتان في نظرة واحدة</h2>
+                <p>تعرف على الاختلاف الأساسي بين BIOS و UEFI</p>
+            </div>
+
+            <div class="comparison">
+
+                <!-- BIOS -->
+
+                <article class="tech-card bios reveal">
+
+                    <div class="tech-header">
+
+                        <div class="tech-icon">
+                            B
+                        </div>
+
+                        <div class="tech-title">
+                            <h2>BIOS</h2>
+                            <span>Basic Input / Output System</span>
+                        </div>
+
+                    </div>
+
+                    <p class="description">
+                        نظام البرامج الثابتة التقليدي الموجود في أجهزة الكمبيوتر
+                        منذ عقود، ويعمل على تهيئة مكونات الجهاز قبل بدء تشغيل نظام التشغيل.
+                    </p>
+
+                    <div class="feature">
+                        <span>تاريخ الظهور</span>
+                        <strong>قديم</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>واجهة المستخدم</span>
+                        <strong>نصية</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>دعم الأقراص</span>
+                        <strong>محدود</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>الأمان</span>
+                        <strong>محدود</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>الإقلاع</span>
+                        <strong>Legacy</strong>
+                    </div>
+
+                </article>
+
+
+                <!-- UEFI -->
+
+                <article class="tech-card uefi reveal">
+
+                    <div class="tech-header">
+
+                        <div class="tech-icon">
+                            U
+                        </div>
+
+                        <div class="tech-title">
+                            <h2>UEFI</h2>
+                            <span>Unified Extensible Firmware Interface</span>
+                        </div>
+
+                    </div>
+
+                    <p class="description">
+                        واجهة حديثة للبرامج الثابتة صممت لتكون بديلاً أكثر
+                        تطوراً لـ BIOS، مع دعم ميزات أمان وأقراص وواجهات حديثة.
+                    </p>
+
+                    <div class="feature">
+                        <span>تاريخ الظهور</span>
+                        <strong>حديث</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>واجهة المستخدم</span>
+                        <strong>رسومية</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>دعم الأقراص</span>
+                        <strong>أكبر بكثير</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>الأمان</span>
+                        <strong>متقدم</strong>
+                    </div>
+
+                    <div class="feature">
+                        <span>الإقلاع</span>
+                        <strong>UEFI</strong>
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- Comparison Table -->
+
+        <section id="table">
+
+            <div class="section-title">
+                <small>02 — COMPARISON</small>
+                <h2>المقارنة التفصيلية</h2>
+                <p>جدول يوضح أهم الاختلافات التقنية</p>
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>الميزة</th>
+                            <th>BIOS</th>
+                            <th>UEFI</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>نوع الواجهة</td>
+                            <td>نصية</td>
+                            <td class="yes">رسومية</td>
+                        </tr>
+
+                        <tr>
+                            <td>سرعة الإقلاع</td>
+                            <td>أبطأ نسبياً</td>
+                            <td class="yes">أسرع</td>
+                        </tr>
+
+                        <tr>
+                            <td>Secure Boot</td>
+                            <td class="no">✕ غير متوفر</td>
+                            <td class="yes">✓ متوفر</td>
+                        </tr>
+
+                        <tr>
+                            <td>دعم GPT</td>
+                            <td>محدود</td>
+                            <td class="yes">✓ مدعوم</td>
+                        </tr>
+
+                        <tr>
+                            <td>الأقراص الأكبر من 2TB</td>
+                            <td class="no">✕ محدود</td>
+                            <td class="yes">✓ دعم أفضل</td>
+                        </tr>
+
+                        <tr>
+                            <td>دعم الماوس</td>
+                            <td class="no">✕ عادةً لا</td>
+                            <td class="yes">✓ نعم</td>
+                        </tr>
+
+                        <tr>
+                            <td>التحديثات والامتدادات</td>
+                            <td>محدودة</td>
+                            <td class="yes">مرنة ومتقدمة</td>
+                        </tr>
+
+                        <tr>
+                            <td>التوافق مع الأجهزة الحديثة</td>
+                            <td>محدود</td>
+                            <td class="yes">ممتاز</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- Scores -->
+
+        <section>
+
+            <div class="section-title">
+                <small>03 — PERFORMANCE</small>
+                <h2>التقييم التقني</h2>
+                <p>مقارنة تقريبية للقدرات والميزات الحديثة</p>
+            </div>
+
+            <div class="scores">
+
+                <div class="score-card">
+
+                    <div class="score-top">
+                        <h3>BIOS</h3>
+                        <div class="score-number">55%</div>
+                    </div>
+
+                    <div class="progress">
+                        <span class="bios-progress"></span>
+                    </div>
+
+                </div>
+
+                <div class="score-card">
+
+                    <div class="score-top">
+                        <h3>UEFI</h3>
+                        <div class="score-number">95%</div>
+                    </div>
+
+                    <div class="progress">
+                        <span class="uefi-progress"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Result -->
+
+        <section id="result">
+
+            <div class="winner">
+
+                <div class="winner-icon">
+                    ✓
+                </div>
+
+                <h2>UEFI هو الخيار الحديث</h2>
+
+                <p>
+                    بالنسبة لمعظم أجهزة الكمبيوتر الحديثة، يوفر UEFI
+                    مزايا أكبر من BIOS التقليدي، خصوصاً فيما يتعلق بسرعة
+                    الإقلاع، الأمان، دعم GPT، الأقراص الكبيرة والميزات الحديثة.
+                    ومع ذلك، قد يبقى BIOS مناسباً للأجهزة القديمة أو بعض حالات
+                    التوافق الخاصة.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+
+    <footer>
+        <div class="container">
+            © 2026 TechCompare — BIOS vs UEFI
+        </div>
+    </footer>
+
+
+    <script>
+
+        // تأثير ظهور العناصر عند تحميل الصفحة
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const elements = document.querySelectorAll(".reveal");
+
+            elements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.08}s`;
+            });
+
+        });
+
+
+        // تغيير لون شريط التقدم عند الوصول إليه
+
+        const progressBars = document.querySelectorAll(".progress span");
+
+        const observer = new IntersectionObserver((entries) => {
+
+            entries.forEach(entry => {
+
+                if (entry.isIntersecting) {
+
+                    entry.target.style.transition =
+                        "width 1.3s cubic-bezier(.2,.8,.2,1)";
+
+                }
+
+            });
+
+        }, { threshold: 0.5 });
+
+
+        progressBars.forEach(bar => observer.observe(bar));
+
+    </script>
+
+</body>
+</html>
